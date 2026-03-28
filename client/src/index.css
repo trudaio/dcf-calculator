@@ -1,0 +1,273 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: #0f1117;
+  color: #e1e4e8;
+  line-height: 1.5;
+}
+
+.app {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+
+.header h1 {
+  font-size: 1.4rem;
+  color: #58a6ff;
+  white-space: nowrap;
+}
+
+.header input[type="text"] {
+  padding: 8px 14px;
+  border-radius: 6px;
+  border: 1px solid #30363d;
+  background: #161b22;
+  color: #e1e4e8;
+  font-size: 14px;
+  width: 120px;
+}
+
+.header button, .btn {
+  padding: 8px 16px;
+  border-radius: 6px;
+  border: 1px solid #30363d;
+  background: #21262d;
+  color: #e1e4e8;
+  cursor: pointer;
+  font-size: 13px;
+  transition: background 0.15s;
+}
+
+.header button:hover, .btn:hover {
+  background: #30363d;
+}
+
+.btn-primary {
+  background: #238636;
+  border-color: #2ea043;
+}
+
+.btn-primary:hover {
+  background: #2ea043;
+}
+
+.header select {
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: 1px solid #30363d;
+  background: #161b22;
+  color: #e1e4e8;
+  font-size: 13px;
+}
+
+/* Tabs */
+.tabs {
+  display: flex;
+  gap: 0;
+  border-bottom: 1px solid #30363d;
+  margin-bottom: 20px;
+  overflow-x: auto;
+}
+
+.tab {
+  padding: 10px 20px;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  color: #8b949e;
+  font-size: 14px;
+  white-space: nowrap;
+  transition: color 0.15s, border-color 0.15s;
+}
+
+.tab:hover {
+  color: #e1e4e8;
+}
+
+.tab.active {
+  color: #58a6ff;
+  border-bottom-color: #58a6ff;
+}
+
+/* Cards */
+.card {
+  background: #161b22;
+  border: 1px solid #30363d;
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 16px;
+}
+
+.card h3 {
+  font-size: 1rem;
+  margin-bottom: 12px;
+  color: #8b949e;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+}
+
+.stat {
+  padding: 12px;
+  background: #0d1117;
+  border-radius: 6px;
+  border: 1px solid #21262d;
+}
+
+.stat-label {
+  font-size: 12px;
+  color: #8b949e;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.stat-value {
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: #e1e4e8;
+  margin-top: 4px;
+}
+
+.stat-value.positive { color: #3fb950; }
+.stat-value.negative { color: #f85149; }
+
+/* Tables */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+th, td {
+  text-align: right;
+  padding: 8px 12px;
+  border-bottom: 1px solid #21262d;
+}
+
+th {
+  color: #8b949e;
+  font-weight: 600;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+td:first-child, th:first-child {
+  text-align: left;
+}
+
+/* Sensitivity grid */
+.sensitivity-grid {
+  display: grid;
+  gap: 2px;
+  font-size: 12px;
+}
+
+.sens-cell {
+  padding: 8px;
+  text-align: center;
+  border-radius: 4px;
+  font-weight: 600;
+}
+
+.sens-header {
+  background: #21262d;
+  color: #8b949e;
+  font-weight: 600;
+  padding: 8px;
+  text-align: center;
+  border-radius: 4px;
+}
+
+/* Forms */
+.form-row {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.form-group label {
+  font-size: 12px;
+  color: #8b949e;
+}
+
+.form-group input, .form-group select {
+  padding: 6px 10px;
+  border-radius: 4px;
+  border: 1px solid #30363d;
+  background: #0d1117;
+  color: #e1e4e8;
+  font-size: 13px;
+  width: 120px;
+}
+
+.loading {
+  text-align: center;
+  padding: 60px;
+  color: #8b949e;
+  font-size: 16px;
+}
+
+.error {
+  color: #f85149;
+  padding: 20px;
+  text-align: center;
+}
+
+.chart-container {
+  width: 100%;
+  height: 300px;
+  margin: 16px 0;
+}
+
+.peers-input {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.peers-input input {
+  padding: 6px 10px;
+  border-radius: 4px;
+  border: 1px solid #30363d;
+  background: #0d1117;
+  color: #e1e4e8;
+  font-size: 13px;
+  width: 300px;
+}
+
+/* Fair value highlight */
+.fair-value-card {
+  background: linear-gradient(135deg, #161b22, #1a2332);
+  border: 1px solid #1f6feb;
+  text-align: center;
+  padding: 24px;
+}
+
+.fair-value-card .stat-value {
+  font-size: 2rem;
+}
