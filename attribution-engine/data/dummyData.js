@@ -1,73 +1,118 @@
 export const dummyEvents = [
-  // Customer 1: Meta ad click → Google search click → TikTok view → Purchase
-  { customerId: 'C001', type: 'click', channel: 'meta', campaign: 'summer_sale', adId: 'ad_101', timestamp: '2026-04-01T10:00:00Z', source: 'facebook', medium: 'cpc', utmCampaign: 'summer_sale' },
-  { customerId: 'C001', type: 'click', channel: 'google', campaign: 'brand_search', adId: 'ad_201', timestamp: '2026-04-03T14:30:00Z', source: 'google', medium: 'cpc', utmCampaign: 'brand_search' },
-  { customerId: 'C001', type: 'view', channel: 'tiktok', campaign: 'viral_video', adId: 'ad_301', timestamp: '2026-04-05T09:15:00Z', source: 'tiktok', medium: 'social' },
-  { customerId: 'C001', type: 'purchase', channel: 'direct', timestamp: '2026-04-06T16:00:00Z', revenue: 120.00, orderId: 'ORD-001' },
+  // C001: Meta ad → view_item → Google search → add_to_cart → begin_checkout → purchase
+  { customerId: 'C001', type: 'click', channel: 'meta', campaign: 'summer_sale', adId: 'ad_101', timestamp: '2026-04-01T10:00:00Z', source: 'facebook', medium: 'cpc' },
+  { customerId: 'C001', type: 'view_item', channel: 'meta', timestamp: '2026-04-01T10:02:00Z', productId: 'SKU-101', productName: 'Running Shoes' },
+  { customerId: 'C001', type: 'click', channel: 'google', campaign: 'brand_search', adId: 'ad_201', timestamp: '2026-04-03T14:30:00Z', source: 'google', medium: 'cpc' },
+  { customerId: 'C001', type: 'view_item', channel: 'google', timestamp: '2026-04-03T14:32:00Z', productId: 'SKU-101', productName: 'Running Shoes' },
+  { customerId: 'C001', type: 'add_to_cart', channel: 'google', timestamp: '2026-04-03T14:35:00Z', productId: 'SKU-101' },
+  { customerId: 'C001', type: 'begin_checkout', channel: 'direct', timestamp: '2026-04-05T16:00:00Z' },
+  { customerId: 'C001', type: 'purchase', channel: 'direct', timestamp: '2026-04-05T16:05:00Z', revenue: 120.00, orderId: 'ORD-001' },
 
-  // Customer 2: Email → Meta retargeting → Purchase
-  { customerId: 'C002', type: 'email_open', channel: 'email', campaign: 'welcome_series', timestamp: '2026-04-02T08:00:00Z' },
+  // C002: Email → view_item → Meta retarget → add_to_cart → purchase (skipped begin_checkout)
   { customerId: 'C002', type: 'email_click', channel: 'email', campaign: 'welcome_series', timestamp: '2026-04-02T08:05:00Z' },
+  { customerId: 'C002', type: 'view_item', channel: 'email', timestamp: '2026-04-02T08:06:00Z', productId: 'SKU-202', productName: 'Yoga Mat' },
   { customerId: 'C002', type: 'click', channel: 'meta', campaign: 'retargeting_q2', adId: 'ad_102', timestamp: '2026-04-04T11:20:00Z', source: 'instagram', medium: 'cpc' },
+  { customerId: 'C002', type: 'add_to_cart', channel: 'meta', timestamp: '2026-04-04T11:25:00Z', productId: 'SKU-202' },
+  { customerId: 'C002', type: 'begin_checkout', channel: 'direct', timestamp: '2026-04-05T20:25:00Z' },
   { customerId: 'C002', type: 'purchase', channel: 'direct', timestamp: '2026-04-05T20:30:00Z', revenue: 85.50, orderId: 'ORD-002' },
 
-  // Customer 3: TikTok → Google → Meta → Google → Purchase (complex journey)
+  // C003: TikTok view → Google → view_item → Meta → add_to_cart → begin_checkout → purchase
   { customerId: 'C003', type: 'view', channel: 'tiktok', campaign: 'influencer_collab', adId: 'ad_302', timestamp: '2026-03-25T12:00:00Z' },
   { customerId: 'C003', type: 'click', channel: 'google', campaign: 'generic_search', adId: 'ad_202', timestamp: '2026-03-28T15:00:00Z' },
+  { customerId: 'C003', type: 'view_item', channel: 'google', timestamp: '2026-03-28T15:02:00Z', productId: 'SKU-303', productName: 'Protein Powder' },
   { customerId: 'C003', type: 'click', channel: 'meta', campaign: 'lookalike_q2', adId: 'ad_103', timestamp: '2026-04-01T09:00:00Z' },
+  { customerId: 'C003', type: 'view_item', channel: 'meta', timestamp: '2026-04-01T09:02:00Z', productId: 'SKU-303', productName: 'Protein Powder' },
+  { customerId: 'C003', type: 'add_to_cart', channel: 'meta', timestamp: '2026-04-01T09:05:00Z', productId: 'SKU-303' },
   { customerId: 'C003', type: 'click', channel: 'google', campaign: 'brand_search', adId: 'ad_203', timestamp: '2026-04-03T17:00:00Z' },
+  { customerId: 'C003', type: 'begin_checkout', channel: 'google', timestamp: '2026-04-03T17:05:00Z' },
   { customerId: 'C003', type: 'purchase', channel: 'direct', timestamp: '2026-04-04T10:00:00Z', revenue: 250.00, orderId: 'ORD-003' },
 
-  // Customer 4: Direct only (organic) → Purchase
+  // C004: Organic → view_item → add_to_cart → begin_checkout → purchase (quick funnel)
   { customerId: 'C004', type: 'organic', channel: 'organic', timestamp: '2026-04-06T10:00:00Z', source: 'google', medium: 'organic' },
-  { customerId: 'C004', type: 'purchase', channel: 'direct', timestamp: '2026-04-06T10:30:00Z', revenue: 45.00, orderId: 'ORD-004' },
+  { customerId: 'C004', type: 'view_item', channel: 'organic', timestamp: '2026-04-06T10:02:00Z', productId: 'SKU-404', productName: 'Water Bottle' },
+  { customerId: 'C004', type: 'add_to_cart', channel: 'organic', timestamp: '2026-04-06T10:10:00Z', productId: 'SKU-404' },
+  { customerId: 'C004', type: 'begin_checkout', channel: 'organic', timestamp: '2026-04-06T10:15:00Z' },
+  { customerId: 'C004', type: 'purchase', channel: 'direct', timestamp: '2026-04-06T10:20:00Z', revenue: 45.00, orderId: 'ORD-004' },
 
-  // Customer 5: Meta → Purchase → Meta retarget → Second purchase (repeat customer)
+  // C005: Meta → purchase → Meta retarget → view_item → add_to_cart → purchase (repeat)
   { customerId: 'C005', type: 'click', channel: 'meta', campaign: 'spring_promo', adId: 'ad_104', timestamp: '2026-03-15T14:00:00Z' },
+  { customerId: 'C005', type: 'view_item', channel: 'meta', timestamp: '2026-03-15T14:03:00Z', productId: 'SKU-505', productName: 'Resistance Bands' },
+  { customerId: 'C005', type: 'add_to_cart', channel: 'meta', timestamp: '2026-03-15T14:10:00Z', productId: 'SKU-505' },
+  { customerId: 'C005', type: 'begin_checkout', channel: 'direct', timestamp: '2026-03-16T08:50:00Z' },
   { customerId: 'C005', type: 'purchase', channel: 'direct', timestamp: '2026-03-16T09:00:00Z', revenue: 75.00, orderId: 'ORD-005' },
   { customerId: 'C005', type: 'click', channel: 'meta', campaign: 'retargeting_q2', adId: 'ad_105', timestamp: '2026-04-10T11:00:00Z' },
+  { customerId: 'C005', type: 'view_item', channel: 'meta', timestamp: '2026-04-10T11:02:00Z', productId: 'SKU-506', productName: 'Foam Roller' },
   { customerId: 'C005', type: 'email_click', channel: 'email', campaign: 'loyalty_program', timestamp: '2026-04-12T08:00:00Z' },
+  { customerId: 'C005', type: 'add_to_cart', channel: 'email', timestamp: '2026-04-12T08:05:00Z', productId: 'SKU-506' },
+  { customerId: 'C005', type: 'begin_checkout', channel: 'direct', timestamp: '2026-04-13T14:50:00Z' },
   { customerId: 'C005', type: 'purchase', channel: 'direct', timestamp: '2026-04-13T15:00:00Z', revenue: 130.00, orderId: 'ORD-006' },
 
-  // Customer 6: Google → TikTok → Purchase
+  // C006: Google → view_item → TikTok → view_item → add_to_cart → begin_checkout → purchase
   { customerId: 'C006', type: 'click', channel: 'google', campaign: 'shopping_ads', adId: 'ad_204', timestamp: '2026-04-08T10:00:00Z' },
+  { customerId: 'C006', type: 'view_item', channel: 'google', timestamp: '2026-04-08T10:02:00Z', productId: 'SKU-101', productName: 'Running Shoes' },
   { customerId: 'C006', type: 'click', channel: 'tiktok', campaign: 'viral_video', adId: 'ad_303', timestamp: '2026-04-10T16:00:00Z' },
+  { customerId: 'C006', type: 'view_item', channel: 'tiktok', timestamp: '2026-04-10T16:02:00Z', productId: 'SKU-101', productName: 'Running Shoes' },
+  { customerId: 'C006', type: 'add_to_cart', channel: 'tiktok', timestamp: '2026-04-10T16:05:00Z', productId: 'SKU-101' },
+  { customerId: 'C006', type: 'begin_checkout', channel: 'direct', timestamp: '2026-04-11T11:50:00Z' },
   { customerId: 'C006', type: 'purchase', channel: 'direct', timestamp: '2026-04-11T12:00:00Z', revenue: 95.00, orderId: 'ORD-007' },
 
-  // Customer 7: Meta only → Purchase
+  // C007: Meta → view_item → add_to_cart → begin_checkout → purchase (single channel fast)
   { customerId: 'C007', type: 'click', channel: 'meta', campaign: 'summer_sale', adId: 'ad_106', timestamp: '2026-04-14T09:00:00Z' },
+  { customerId: 'C007', type: 'view_item', channel: 'meta', timestamp: '2026-04-14T09:02:00Z', productId: 'SKU-707', productName: 'Gym Bag' },
+  { customerId: 'C007', type: 'add_to_cart', channel: 'meta', timestamp: '2026-04-14T09:10:00Z', productId: 'SKU-707' },
+  { customerId: 'C007', type: 'begin_checkout', channel: 'meta', timestamp: '2026-04-14T09:35:00Z' },
   { customerId: 'C007', type: 'purchase', channel: 'direct', timestamp: '2026-04-14T09:45:00Z', revenue: 60.00, orderId: 'ORD-008' },
 
-  // Customer 8: Google → Email → Meta → TikTok → Purchase (4-channel journey)
+  // C008: Google → view_item → Email → Meta → view_item → TikTok → add_to_cart → begin_checkout → purchase
   { customerId: 'C008', type: 'click', channel: 'google', campaign: 'generic_search', adId: 'ad_205', timestamp: '2026-04-01T08:00:00Z' },
+  { customerId: 'C008', type: 'view_item', channel: 'google', timestamp: '2026-04-01T08:02:00Z', productId: 'SKU-808', productName: 'Smartwatch' },
   { customerId: 'C008', type: 'email_click', channel: 'email', campaign: 'newsletter', timestamp: '2026-04-05T10:00:00Z' },
   { customerId: 'C008', type: 'click', channel: 'meta', campaign: 'retargeting_q2', adId: 'ad_107', timestamp: '2026-04-08T14:00:00Z' },
+  { customerId: 'C008', type: 'view_item', channel: 'meta', timestamp: '2026-04-08T14:02:00Z', productId: 'SKU-808', productName: 'Smartwatch' },
   { customerId: 'C008', type: 'click', channel: 'tiktok', campaign: 'influencer_collab', adId: 'ad_304', timestamp: '2026-04-12T11:00:00Z' },
+  { customerId: 'C008', type: 'add_to_cart', channel: 'tiktok', timestamp: '2026-04-12T11:05:00Z', productId: 'SKU-808' },
+  { customerId: 'C008', type: 'begin_checkout', channel: 'direct', timestamp: '2026-04-13T15:50:00Z' },
   { customerId: 'C008', type: 'purchase', channel: 'direct', timestamp: '2026-04-13T16:00:00Z', revenue: 180.00, orderId: 'ORD-009' },
 
   // Non-converting visitors (needed for data-driven models)
-  // V01: Meta click → bounced
+  // V01: Meta → view_item only (bounced after viewing)
   { customerId: 'V001', type: 'click', channel: 'meta', campaign: 'summer_sale', timestamp: '2026-04-02T11:00:00Z' },
-  // V02: Google click → TikTok view → abandoned
+  { customerId: 'V001', type: 'view_item', channel: 'meta', timestamp: '2026-04-02T11:02:00Z', productId: 'SKU-101' },
+  // V02: Google → view_item → TikTok → view_item (browsed, no cart)
   { customerId: 'V002', type: 'click', channel: 'google', campaign: 'generic_search', timestamp: '2026-04-03T09:00:00Z' },
+  { customerId: 'V002', type: 'view_item', channel: 'google', timestamp: '2026-04-03T09:02:00Z', productId: 'SKU-303' },
   { customerId: 'V002', type: 'view', channel: 'tiktok', campaign: 'viral_video', timestamp: '2026-04-04T15:00:00Z' },
-  // V03: TikTok → Meta → abandoned
+  { customerId: 'V002', type: 'view_item', channel: 'tiktok', timestamp: '2026-04-04T15:02:00Z', productId: 'SKU-303' },
+  // V03: TikTok → view_item → Meta → add_to_cart → abandoned (cart abandonment)
   { customerId: 'V003', type: 'view', channel: 'tiktok', campaign: 'influencer_collab', timestamp: '2026-04-05T10:00:00Z' },
+  { customerId: 'V003', type: 'view_item', channel: 'tiktok', timestamp: '2026-04-05T10:02:00Z', productId: 'SKU-505' },
   { customerId: 'V003', type: 'click', channel: 'meta', campaign: 'retargeting_q2', timestamp: '2026-04-07T14:00:00Z' },
-  // V04: Email only → no purchase
+  { customerId: 'V003', type: 'add_to_cart', channel: 'meta', timestamp: '2026-04-07T14:05:00Z', productId: 'SKU-505' },
+  // V04: Email → view_item → add_to_cart → begin_checkout → abandoned (checkout abandonment)
   { customerId: 'V004', type: 'email_click', channel: 'email', campaign: 'newsletter', timestamp: '2026-04-06T08:00:00Z' },
-  // V05: Google → Google → abandoned
+  { customerId: 'V004', type: 'view_item', channel: 'email', timestamp: '2026-04-06T08:02:00Z', productId: 'SKU-707' },
+  { customerId: 'V004', type: 'add_to_cart', channel: 'email', timestamp: '2026-04-06T08:10:00Z', productId: 'SKU-707' },
+  { customerId: 'V004', type: 'begin_checkout', channel: 'email', timestamp: '2026-04-06T08:15:00Z' },
+  // V05: Google → view_item → Google → view_item (multiple views, no cart)
   { customerId: 'V005', type: 'click', channel: 'google', campaign: 'brand_search', timestamp: '2026-04-08T10:00:00Z' },
+  { customerId: 'V005', type: 'view_item', channel: 'google', timestamp: '2026-04-08T10:02:00Z', productId: 'SKU-808' },
   { customerId: 'V005', type: 'click', channel: 'google', campaign: 'shopping_ads', timestamp: '2026-04-09T12:00:00Z' },
-  // V06: Meta → Email → Google → abandoned (long journey, no conversion)
+  { customerId: 'V005', type: 'view_item', channel: 'google', timestamp: '2026-04-09T12:02:00Z', productId: 'SKU-808' },
+  // V06: Meta → view_item → Email → Google → add_to_cart → abandoned (long journey, cart abandon)
   { customerId: 'V006', type: 'click', channel: 'meta', campaign: 'lookalike_q2', timestamp: '2026-04-01T09:00:00Z' },
+  { customerId: 'V006', type: 'view_item', channel: 'meta', timestamp: '2026-04-01T09:02:00Z', productId: 'SKU-202' },
   { customerId: 'V006', type: 'email_click', channel: 'email', campaign: 'welcome_series', timestamp: '2026-04-04T11:00:00Z' },
   { customerId: 'V006', type: 'click', channel: 'google', campaign: 'generic_search', timestamp: '2026-04-07T16:00:00Z' },
-  // V07: TikTok only → bounced
+  { customerId: 'V006', type: 'add_to_cart', channel: 'google', timestamp: '2026-04-07T16:05:00Z', productId: 'SKU-202' },
+  // V07: TikTok → view_item only (bounced)
   { customerId: 'V007', type: 'view', channel: 'tiktok', campaign: 'viral_video', timestamp: '2026-04-10T13:00:00Z' },
-  // V08: Meta → TikTok → abandoned
+  { customerId: 'V007', type: 'view_item', channel: 'tiktok', timestamp: '2026-04-10T13:02:00Z', productId: 'SKU-404' },
+  // V08: Meta → view_item → TikTok → view_item → add_to_cart → abandoned
   { customerId: 'V008', type: 'click', channel: 'meta', campaign: 'spring_promo', timestamp: '2026-04-11T09:00:00Z' },
+  { customerId: 'V008', type: 'view_item', channel: 'meta', timestamp: '2026-04-11T09:02:00Z', productId: 'SKU-101' },
   { customerId: 'V008', type: 'click', channel: 'tiktok', campaign: 'influencer_collab', timestamp: '2026-04-13T14:00:00Z' },
+  { customerId: 'V008', type: 'view_item', channel: 'tiktok', timestamp: '2026-04-13T14:02:00Z', productId: 'SKU-101' },
+  { customerId: 'V008', type: 'add_to_cart', channel: 'tiktok', timestamp: '2026-04-13T14:05:00Z', productId: 'SKU-101' },
 ];
 
 export const dummyOrders = [

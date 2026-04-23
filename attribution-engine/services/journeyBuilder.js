@@ -1,4 +1,9 @@
-const TOUCHPOINT_TYPES = new Set(['click', 'view', 'impression', 'email_open', 'email_click', 'sms_click', 'social_click', 'referral', 'organic', 'direct']);
+const TOUCHPOINT_TYPES = new Set([
+  'click', 'view', 'impression',
+  'email_open', 'email_click', 'sms_click', 'social_click',
+  'referral', 'organic', 'direct',
+  'view_item', 'add_to_cart', 'begin_checkout',
+]);
 const CONVERSION_TYPES = new Set(['purchase', 'order', 'subscription']);
 
 export function buildJourney(events, customerId) {

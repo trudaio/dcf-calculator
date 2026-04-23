@@ -6,6 +6,7 @@ import * as metrics from './domain/metrics.js';
 import { computeBlendedStats, computeBlendedStatsOverTime } from './domain/blendedStats.js';
 import { computeLtv, computeLtvByChannel, computeCohortMetrics, computeRepeatRate, computeWindowedLtv } from './domain/customerMetrics.js';
 import { computeAttribution, computeAllModels, computeFromEvents, computeDataDriven } from './services/attributionService.js';
+import { computeFunnel, computeFunnelByChannel, computeFunnelOverTime, computeDropoffs, computeDropoffsByChannel } from './domain/funnelAnalysis.js';
 import { buildJourneys } from './services/journeyBuilder.js';
 import { dummyEvents, dummyOrders, dummyChannelStats, dummyAttributionData } from './data/dummyData.js';
 
@@ -180,6 +181,47 @@ app.get('/api/customer/demo', (_req, res) => {
     '90day': computeWindowedLtv(dummyOrders, 90),
   };
   res.json({ overall, byChannel, cohorts, repeatRate, windowed });
+});
+
+// --- Funnel Analysis ---
+app.post('/api/funnel/compute', (req, res) => {
+  try {
+    const { events } = req.body;
+    const data = events || dummyEvents;
+    const result = computeFunnelByChannel(data);
+    res.json(result);
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
+app.post('/api/funnel/over-time', (req, res) => {
+  try {
+    const { events, granularity = 'daily' } = req.body;
+    const data = events || dummyEvents;
+    const result = computeFunnelOverTime(data, granularity);
+    res.json(result);
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
+app.post('/api/funnel/dropoffs', (req, res) => {
+  try {
+    const { events } = req.body;
+    const data = events || dummyEvents;
+    const result = computeDropoffsByChannel(data);
+    res.json(result);
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
+app.get('/api/funnel/demo', (_req, res) => {
+  const funnel = computeFunnelByChannel(dummyEvents);
+  const dropoffs = computeDropoffsByChannel(dummyEvents);
+  const overTime = computeFunnelOverTime(dummyEvents, 'daily');
+  res.json({ funnel, dropoffs, overTime });
 });
 
 // --- Start ---
