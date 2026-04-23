@@ -1,5 +1,35 @@
 # Testing & QA Checklist
 
+## Attribution Engine
+
+### Done
+- [x] 18 e-commerce metric formulas (ROAS, MER, CAC, LTV, CLV, AOV, etc.)
+- [x] 5 rule-based attribution models (first-click, last-click, linear, position-based, time-decay)
+- [x] Triple Attribution model (per-channel last-click)
+- [x] Markov Chain data-driven model (transition matrix + removal effect)
+- [x] Shapley Value data-driven model (exact + Monte Carlo)
+- [x] Customer journey builder with attribution windows
+- [x] Blended cross-channel stats (daily/weekly/monthly)
+- [x] Customer metrics: LTV per channel, cohort analysis, repeat rate, windowed LTV
+- [x] REST API with demo endpoints and dummy data (44 events, 16 journeys)
+- [x] 109 tests passing
+- [x] README with full documentation
+
+### Pending
+- [ ] Run /ultrareview when available
+- [ ] Move attribution-engine to separate GitHub repo (needs manual repo creation)
+- [ ] Add more non-converting visitor data for better Markov results
+- [ ] Dashboard UI (React frontend)
+- [ ] Connect to real Google Ads / Meta / TikTok / GA4 APIs
+- [ ] Tracking pixel implementation
+- [ ] Post-purchase survey module
+- [ ] Sonar-like data enrichment (CAPI, Events API)
+- [ ] Total Impact equivalent (ML model with survey weighting)
+- [ ] ClickHouse/PostgreSQL data layer for production use
+- [ ] Deploy to Google Cloud Run
+
+## DCF Calculator (Original Project)
+
 ## Phase 1: Backend API Testing
 
 - [ ] `GET /api/quote/MSFT` — returns valid quote with price, marketCap, name
