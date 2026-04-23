@@ -44,6 +44,30 @@ export const dummyEvents = [
   { customerId: 'C008', type: 'click', channel: 'meta', campaign: 'retargeting_q2', adId: 'ad_107', timestamp: '2026-04-08T14:00:00Z' },
   { customerId: 'C008', type: 'click', channel: 'tiktok', campaign: 'influencer_collab', adId: 'ad_304', timestamp: '2026-04-12T11:00:00Z' },
   { customerId: 'C008', type: 'purchase', channel: 'direct', timestamp: '2026-04-13T16:00:00Z', revenue: 180.00, orderId: 'ORD-009' },
+
+  // Non-converting visitors (needed for data-driven models)
+  // V01: Meta click → bounced
+  { customerId: 'V001', type: 'click', channel: 'meta', campaign: 'summer_sale', timestamp: '2026-04-02T11:00:00Z' },
+  // V02: Google click → TikTok view → abandoned
+  { customerId: 'V002', type: 'click', channel: 'google', campaign: 'generic_search', timestamp: '2026-04-03T09:00:00Z' },
+  { customerId: 'V002', type: 'view', channel: 'tiktok', campaign: 'viral_video', timestamp: '2026-04-04T15:00:00Z' },
+  // V03: TikTok → Meta → abandoned
+  { customerId: 'V003', type: 'view', channel: 'tiktok', campaign: 'influencer_collab', timestamp: '2026-04-05T10:00:00Z' },
+  { customerId: 'V003', type: 'click', channel: 'meta', campaign: 'retargeting_q2', timestamp: '2026-04-07T14:00:00Z' },
+  // V04: Email only → no purchase
+  { customerId: 'V004', type: 'email_click', channel: 'email', campaign: 'newsletter', timestamp: '2026-04-06T08:00:00Z' },
+  // V05: Google → Google → abandoned
+  { customerId: 'V005', type: 'click', channel: 'google', campaign: 'brand_search', timestamp: '2026-04-08T10:00:00Z' },
+  { customerId: 'V005', type: 'click', channel: 'google', campaign: 'shopping_ads', timestamp: '2026-04-09T12:00:00Z' },
+  // V06: Meta → Email → Google → abandoned (long journey, no conversion)
+  { customerId: 'V006', type: 'click', channel: 'meta', campaign: 'lookalike_q2', timestamp: '2026-04-01T09:00:00Z' },
+  { customerId: 'V006', type: 'email_click', channel: 'email', campaign: 'welcome_series', timestamp: '2026-04-04T11:00:00Z' },
+  { customerId: 'V006', type: 'click', channel: 'google', campaign: 'generic_search', timestamp: '2026-04-07T16:00:00Z' },
+  // V07: TikTok only → bounced
+  { customerId: 'V007', type: 'view', channel: 'tiktok', campaign: 'viral_video', timestamp: '2026-04-10T13:00:00Z' },
+  // V08: Meta → TikTok → abandoned
+  { customerId: 'V008', type: 'click', channel: 'meta', campaign: 'spring_promo', timestamp: '2026-04-11T09:00:00Z' },
+  { customerId: 'V008', type: 'click', channel: 'tiktok', campaign: 'influencer_collab', timestamp: '2026-04-13T14:00:00Z' },
 ];
 
 export const dummyOrders = [

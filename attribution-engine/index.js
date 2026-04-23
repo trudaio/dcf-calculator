@@ -5,7 +5,7 @@ import cors from 'cors';
 import * as metrics from './domain/metrics.js';
 import { computeBlendedStats, computeBlendedStatsOverTime } from './domain/blendedStats.js';
 import { computeLtv, computeLtvByChannel, computeCohortMetrics, computeRepeatRate, computeWindowedLtv } from './domain/customerMetrics.js';
-import { computeAttribution, computeAllModels, computeFromEvents } from './services/attributionService.js';
+import { computeAttribution, computeAllModels, computeFromEvents, computeDataDriven } from './services/attributionService.js';
 import { buildJourneys } from './services/journeyBuilder.js';
 import { dummyEvents, dummyOrders, dummyChannelStats, dummyAttributionData } from './data/dummyData.js';
 
@@ -62,7 +62,8 @@ app.post('/api/attribution/compare', (req, res) => {
     const { events, options = {} } = req.body;
     const data = events || dummyEvents;
     const journeys = buildJourneys(data);
-    const result = computeAllModels(journeys, options);
+    const allJourneys = buildJourneys(data, { includeNonConverting: true });
+    const result = computeAllModels(journeys, { ...options, _allJourneys: allJourneys });
     res.json(result);
   } catch (err) {
     res.status(400).json({ error: err.message });
@@ -71,11 +72,41 @@ app.post('/api/attribution/compare', (req, res) => {
 
 app.get('/api/attribution/demo', (_req, res) => {
   const journeys = buildJourneys(dummyEvents);
-  const result = computeAllModels(journeys);
+  const allJourneys = buildJourneys(dummyEvents, { includeNonConverting: true });
+  const result = computeAllModels(journeys, { _allJourneys: allJourneys });
   res.json({
     eventsCount: dummyEvents.length,
     journeysCount: journeys.length,
+    nonConvertingJourneys: allJourneys.length - journeys.length,
     models: result,
+  });
+});
+
+// --- Data-Driven Attribution ---
+app.post('/api/attribution/data-driven', (req, res) => {
+  try {
+    const { events, model = 'markov', options = {} } = req.body;
+    const data = events || dummyEvents;
+    const journeys = buildJourneys(data);
+    const allJourneys = buildJourneys(data, { includeNonConverting: true });
+    const result = computeDataDriven(journeys, model, options, { allJourneys });
+    res.json(result);
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
+app.get('/api/attribution/data-driven/demo', (_req, res) => {
+  const journeys = buildJourneys(dummyEvents);
+  const allJourneys = buildJourneys(dummyEvents, { includeNonConverting: true });
+  const markov = computeDataDriven(journeys, 'markov', {}, { allJourneys });
+  const shapley = computeDataDriven(journeys, 'shapley', {}, { allJourneys });
+  res.json({
+    eventsCount: dummyEvents.length,
+    convertingJourneys: journeys.length,
+    nonConvertingJourneys: allJourneys.length - journeys.length,
+    markov,
+    shapley,
   });
 });
 

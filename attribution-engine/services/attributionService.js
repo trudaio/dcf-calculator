@@ -1,5 +1,6 @@
 import { applyModel, listModels } from '../domain/attributionModels.js';
 import { tripleAttribution, tripleAttributionWithWindow } from '../domain/channelAttribution.js';
+import { markovAttribution, shapleyAttribution, journeysToPaths } from '../domain/dataDrivenModels.js';
 import { buildJourneys, filterByWindow, splitByConversion } from './journeyBuilder.js';
 import * as metrics from '../domain/metrics.js';
 
@@ -81,6 +82,48 @@ export function computeAttribution(journeys, model, options = {}) {
   };
 }
 
+export function computeDataDriven(journeys, model, options = {}, { allJourneys } = {}) {
+  const windowDays = options.windowDays;
+  const source = allJourneys || journeys;
+  const filtered = windowDays
+    ? source.map((j) => filterByWindow(j, windowDays))
+    : source;
+
+  const paths = journeysToPaths(filtered);
+  const convertingPaths = paths.filter((p) => p.converted);
+  const totalRevenue = convertingPaths.reduce((s, p) => s + p.value, 0);
+
+  let result;
+  if (model === 'markov') {
+    result = markovAttribution(paths);
+  } else if (model === 'shapley') {
+    result = shapleyAttribution(paths, {
+      monteCarlo: options.monteCarlo,
+      samples: options.samples,
+    });
+  } else {
+    throw new Error(`Unknown data-driven model: ${model}`);
+  }
+
+  const channels = Object.entries(result.channels).map(([channel, data]) => ({
+    channel,
+    ...data,
+    attributedRevenue: data.share * totalRevenue,
+    conversions: Math.round(data.share * convertingPaths.length),
+    roas: options.channelSpend?.[channel]
+      ? metrics.roas(data.share * totalRevenue, options.channelSpend[channel])
+      : null,
+  }));
+
+  return {
+    model,
+    totalConversions: convertingPaths.length,
+    totalRevenue,
+    baselineConversion: result.baselineConversion || null,
+    channels,
+  };
+}
+
 export function computeAllModels(journeys, options = {}) {
   const standardModels = listModels();
   const allModels = [...standardModels, 'tripleAttribution'];
@@ -90,11 +133,17 @@ export function computeAllModels(journeys, options = {}) {
     results[model] = computeAttribution(journeys, model, options);
   }
 
+  results.markov = computeDataDriven(journeys, 'markov', options, { allJourneys: options._allJourneys });
+  results.shapley = computeDataDriven(journeys, 'shapley', options, { allJourneys: options._allJourneys });
+
   return results;
 }
 
 export function computeFromEvents(events, model, options = {}) {
   const journeys = buildJourneys(events);
-  if (model === 'all') return computeAllModels(journeys, options);
+  const allJourneys = buildJourneys(events, { includeNonConverting: true });
+
+  if (model === 'all') return computeAllModels(journeys, { ...options, _allJourneys: allJourneys });
+  if (model === 'markov' || model === 'shapley') return computeDataDriven(journeys, model, options, { allJourneys });
   return computeAttribution(journeys, model, options);
 }

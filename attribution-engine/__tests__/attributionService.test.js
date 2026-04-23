@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { computeAttribution, computeAllModels, computeFromEvents } from '../services/attributionService.js';
+import { computeAttribution, computeAllModels, computeFromEvents, computeDataDriven } from '../services/attributionService.js';
 import { buildJourneys } from '../services/journeyBuilder.js';
 
 const events = [
@@ -49,16 +49,46 @@ describe('attributionService', () => {
     });
   });
 
+  describe('computeDataDriven', () => {
+    it('markov returns attributed revenue that sums to total', () => {
+      const result = computeDataDriven(journeys, 'markov');
+      const totalAttributed = result.channels.reduce((s, c) => s + c.attributedRevenue, 0);
+      expect(totalAttributed).toBeCloseTo(result.totalRevenue, 1);
+    });
+
+    it('shapley returns attributed revenue that sums to total', () => {
+      const result = computeDataDriven(journeys, 'shapley');
+      const totalAttributed = result.channels.reduce((s, c) => s + c.attributedRevenue, 0);
+      expect(totalAttributed).toBeCloseTo(result.totalRevenue, 0);
+    });
+
+    it('markov reports correct total conversions', () => {
+      const result = computeDataDriven(journeys, 'markov');
+      expect(result.totalConversions).toBe(2);
+    });
+
+    it('shapley reports correct total conversions', () => {
+      const result = computeDataDriven(journeys, 'shapley');
+      expect(result.totalConversions).toBe(2);
+    });
+
+    it('throws for unknown data-driven model', () => {
+      expect(() => computeDataDriven(journeys, 'unknown')).toThrow();
+    });
+  });
+
   describe('computeAllModels', () => {
-    it('returns results for all 6 models', () => {
+    it('returns results for all 8 models (5 standard + triple + markov + shapley)', () => {
       const result = computeAllModels(journeys);
-      expect(Object.keys(result).length).toBe(6);
+      expect(Object.keys(result).length).toBe(8);
       expect(result.firstClick).toBeDefined();
       expect(result.lastClick).toBeDefined();
       expect(result.linear).toBeDefined();
       expect(result.positionBased).toBeDefined();
       expect(result.timeDecay).toBeDefined();
       expect(result.tripleAttribution).toBeDefined();
+      expect(result.markov).toBeDefined();
+      expect(result.shapley).toBeDefined();
     });
 
     it('all models report same number of conversions', () => {
@@ -75,9 +105,21 @@ describe('attributionService', () => {
       expect(result.totalConversions).toBe(2);
     });
 
-    it('returns all models when model is "all"', () => {
+    it('returns all 8 models when model is "all"', () => {
       const result = computeFromEvents(events, 'all');
-      expect(Object.keys(result).length).toBe(6);
+      expect(Object.keys(result).length).toBe(8);
+    });
+
+    it('supports markov via computeFromEvents', () => {
+      const result = computeFromEvents(events, 'markov');
+      expect(result.model).toBe('markov');
+      expect(result.channels.length).toBeGreaterThan(0);
+    });
+
+    it('supports shapley via computeFromEvents', () => {
+      const result = computeFromEvents(events, 'shapley');
+      expect(result.model).toBe('shapley');
+      expect(result.channels.length).toBeGreaterThan(0);
     });
   });
 });

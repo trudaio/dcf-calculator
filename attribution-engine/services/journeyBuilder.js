@@ -21,7 +21,7 @@ export function buildJourney(events, customerId) {
   return { customerId, touchpoints, conversions };
 }
 
-export function buildJourneys(allEvents) {
+export function buildJourneys(allEvents, { includeNonConverting = false } = {}) {
   const byCustomer = {};
 
   for (const event of allEvents) {
@@ -33,7 +33,7 @@ export function buildJourneys(allEvents) {
   const journeys = [];
   for (const [customerId, events] of Object.entries(byCustomer)) {
     const journey = buildJourney(events, customerId);
-    if (journey.conversions.length > 0) {
+    if (journey.conversions.length > 0 || includeNonConverting) {
       journeys.push(journey);
     }
   }

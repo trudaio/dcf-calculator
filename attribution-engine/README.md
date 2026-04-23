@@ -23,7 +23,9 @@ All endpoints accept POST with custom data or GET `/demo` for sample output.
 | `/api/metrics/demo` | GET | Demo with sample data |
 | `/api/attribution/compute` | POST | Run single attribution model |
 | `/api/attribution/compare` | POST | Compare all 6 models side-by-side |
-| `/api/attribution/demo` | GET | Demo with 8 customer journeys |
+| `/api/attribution/demo` | GET | Demo with all 8 models compared |
+| `/api/attribution/data-driven` | POST | Run Markov or Shapley model |
+| `/api/attribution/data-driven/demo` | GET | Demo Markov vs Shapley side-by-side |
 | `/api/blended/compute` | POST | Blended cross-channel stats |
 | `/api/blended/over-time` | POST | Daily/weekly/monthly aggregation |
 | `/api/blended/demo` | GET | Demo with 3-day channel data |
@@ -56,7 +58,9 @@ All formulas match [Triple Whale's documented definitions](https://triplewhale.r
 | **Bounce Rate** | (Bounces / Sessions) × 100 |
 | **LTV:CAC Ratio** | LTV / CAC |
 
-## Attribution Models (6)
+## Attribution Models (8)
+
+### Rule-Based Models (5)
 
 | Model | How it works |
 |-------|-------------|
@@ -65,7 +69,28 @@ All formulas match [Triple Whale's documented definitions](https://triplewhale.r
 | **Linear** | Equal credit across all touchpoints |
 | **Position-Based** | 40% first, 40% last, 20% distributed across middle |
 | **Time-Decay** | Exponential decay with configurable half-life (default 7 days) |
+
+### Platform-Specific Models (1)
+
+| Model | How it works |
+|-------|-------------|
 | **Triple Attribution** | 100% credit to last click **per channel independently** — each channel gets full conversion value without competing against other channels |
+
+### Data-Driven Models (2)
+
+| Model | How it works |
+|-------|-------------|
+| **Markov Chain** | Models journeys as state transitions. Computes "removal effect" — how much conversion probability drops when a channel is removed. Channels whose removal causes the biggest drop get the most credit. |
+| **Shapley Value** | Game theory approach (cooperative games). Computes each channel's average marginal contribution across all possible coalitions of channels. Mathematically proven to be the only fair distribution satisfying efficiency, symmetry, and additivity axioms. |
+
+### How Data-Driven Models Differ from Rule-Based
+
+Rule-based models use fixed rules (e.g., "first touchpoint gets all credit"). Data-driven models analyze actual conversion patterns:
+
+- **Markov Chain**: "If we remove Google from all journeys, conversion rate drops 25% → Google gets 25% of the removal effect credit"
+- **Shapley Value**: "Across all possible channel combinations, adding Meta increases conversion rate by X on average → Meta's fair share is X"
+
+Both require **converting AND non-converting** journeys to work — they need to distinguish what leads to conversion vs. what doesn't.
 
 ### Triple Attribution explained
 
@@ -76,6 +101,8 @@ Unlike standard models where channels compete for credit, Triple Attribution eva
 | First-Click | $100 | $0 | $0 | $100 |
 | Last-Click | $0 | $0 | $100 | $100 |
 | Linear | $33 | $33 | $33 | $100 |
+| Markov Chain | varies | varies | varies | $100 |
+| Shapley Value | varies | varies | varies | $100 |
 | **Triple Attribution** | **$100** | **$100** | **$100** | **$300** |
 
 This lets you evaluate each platform's contribution without forcing cross-channel competition.
@@ -87,7 +114,8 @@ attribution-engine/
 ├── index.js                    # Express REST API (port 3002)
 ├── domain/
 │   ├── metrics.js              # 18 e-commerce metric formulas
-│   ├── attributionModels.js    # 5 standard models + dispatcher
+│   ├── attributionModels.js    # 5 rule-based models + dispatcher
+│   ├── dataDrivenModels.js     # Markov Chain + Shapley Value models
 │   ├── channelAttribution.js   # Triple Attribution (per-channel)
 │   ├── blendedStats.js         # Cross-channel aggregation
 │   └── customerMetrics.js      # LTV, CLV, cohort analysis
