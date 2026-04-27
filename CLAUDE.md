@@ -110,6 +110,81 @@ npm run client         # Vite on :5188
 2. **Track Progress**: Mark items complete as you go
 3. **Capture Lessons**: Update `tasks/lessons.md` after corrections
 
+## Attribution Engine (`attribution-engine/`)
+
+### Overview
+Standalone marketing attribution engine replicating Triple Whale formulas and models. Separate from DCF calculator — lives as a subfolder but intended as its own repo.
+
+### Tech Stack
+- **Backend**: Node.js (ESM), Express 4, port 3002
+- **Tests**: Vitest, 109 tests
+- **No database** — stateless computation engine
+
+### Architecture
+```
+attribution-engine/
+├── index.js                    # Express REST API (port 3002)
+├── domain/
+│   ├── metrics.js              # 18 e-commerce formulas (ROAS, MER, CAC, LTV, etc.)
+│   ├── attributionModels.js    # 5 rule-based models + dispatcher
+│   ├── dataDrivenModels.js     # Markov Chain + Shapley Value (data-driven)
+│   ├── channelAttribution.js   # Triple Attribution (per-channel last-click)
+│   ├── blendedStats.js         # Cross-channel aggregation (daily/weekly/monthly)
+│   └── customerMetrics.js      # LTV per channel, cohort analysis, windowed LTV
+├── services/
+│   ├── journeyBuilder.js       # Customer journey construction from events
+│   └── attributionService.js   # Orchestrator — all 8 models + metrics
+├── data/
+│   └── dummyData.js            # 44 events (8 converters + 8 non-converters), 4 channels
+└── __tests__/                  # 109 tests
+```
+
+### 8 Attribution Models
+| Model | Type | Key concept |
+|-------|------|-------------|
+| First-Click | Rule-based | 100% to first touchpoint |
+| Last-Click | Rule-based | 100% to last touchpoint |
+| Linear | Rule-based | Equal credit to all |
+| Position-Based | Rule-based | 40% first, 40% last, 20% middle |
+| Time-Decay | Rule-based | Exponential decay with configurable half-life |
+| Triple Attribution | Platform-specific | 100% per channel independently (Triple Whale's model) |
+| Markov Chain | Data-driven | Removal effect — how much conversion drops without a channel |
+| Shapley Value | Data-driven | Game theory — average marginal contribution across all coalitions |
+
+### Key API Endpoints
+```
+POST /api/metrics/compute         — 18 e-commerce formulas
+POST /api/attribution/compute     — single model attribution
+POST /api/attribution/compare     — all 8 models side-by-side
+POST /api/attribution/data-driven — Markov or Shapley specifically
+POST /api/blended/compute         — cross-channel blended stats
+POST /api/customer/ltv            — LTV + cohort metrics
+GET  /api/*/demo                  — demo endpoints with dummy data
+```
+
+### Critical Knowledge
+- Data-driven models (Markov, Shapley) need BOTH converting AND non-converting journeys
+- `buildJourneys(events, { includeNonConverting: true })` for data-driven models
+- Shapley: clip negative values to 0 before normalizing shares
+- Markov: uses absorbing chain matrix inversion (not iterative simulation)
+- Shapley exact: O(2^n) — auto-switches to Monte Carlo above 12 channels
+- Triple Attribution total > conversion value by design (channels don't compete)
+
+### Commands
+```bash
+cd attribution-engine
+npm install
+npm run dev            # Express on :3002 with --watch
+npm test               # 109 tests via vitest
+```
+
+### Pending Work
+- Move to separate GitHub repo (MCP token scoped to dcf-calculator only)
+- Dashboard UI (React frontend)
+- Real API integrations (Google Ads, Meta, TikTok, GA4)
+- Tracking pixel, post-purchase surveys
+- ML-based Total Impact model alternative (Bayesian or MMM)
+
 ## Core Principles
 - **Simplicity First**: Make every change as simple as possible
 - **No Laziness**: Find root causes. No temporary fixes

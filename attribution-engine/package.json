@@ -1,0 +1,21 @@
+{
+  "name": "attribution-engine",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Marketing attribution engine replicating Triple Whale formulas and models",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "node --watch index.js",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2"
+  },
+  "devDependencies": {
+    "vitest": "^3.1.3"
+  }
+}

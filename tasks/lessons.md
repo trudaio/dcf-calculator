@@ -51,3 +51,47 @@ Track mistakes and patterns to avoid repeating them.
 **Root cause**: Profile endpoint also doesn't have PE/EPS. Must compute from income statement: `eps = netIncome / weightedAverageShsOutDil`, `pe = price / eps`.
 
 **Rule**: For FMP stable API, always compute PE and EPS from income statement data. Don't rely on quote or profile endpoints for these.
+
+---
+
+## 2026-04-23 — Data-Driven Models Need Non-Converting Paths
+
+**Mistake**: Markov Chain model returned 0 removal effects for all channels. Baseline conversion was 100% because `buildJourneys()` only returns converting journeys.
+
+**Root cause**: Markov and Shapley models need both converting AND non-converting paths to compute meaningful probabilities. Without non-converters, removing any channel doesn't change the conversion rate (still 100%).
+
+**Fix**: Added `includeNonConverting` option to `buildJourneys()`, created dummy non-converting visitors (8 bounced/abandoned journeys), and passed `allJourneys` separately to data-driven model functions.
+
+**Rule**: Data-driven attribution models always need the full dataset — converters + non-converters. Rule-based models (first-click, linear, etc.) only need converters.
+
+---
+
+## 2026-04-23 — Shapley Value Negative Values Break Share Normalization
+
+**Mistake**: Shapley shares were all 0 despite positive Shapley values for most channels. One channel (organic) had a large negative Shapley value, causing the total to be ~0 and dividing by ~0.
+
+**Root cause**: In the dummy data, organic presence correlated with lower conversion rates. Shapley correctly assigned a negative marginal contribution, but the naive normalization `value / totalValue` broke when the total was near zero.
+
+**Fix**: Clip negative Shapley values to 0 before computing shares. Channels that hurt conversion shouldn't receive positive credit. The raw `shapleyValue` (including negative) is still returned for diagnostic purposes.
+
+**Rule**: When normalizing Shapley values to shares, clip negatives to 0 first. Negative values are informational (channel hurts conversion) but shouldn't distort the credit distribution.
+
+---
+
+## 2026-04-23 — Git Commit Signing Fails Outside Repo Context
+
+**Mistake**: Tried to create a separate git repo at `/home/user/attribution-engine/` and commit — signing server returned 400 "missing source".
+
+**Root cause**: The commit signing infrastructure in this environment is tied to the specific repo context (`dcf-calculator`). New repos outside that context can't sign commits.
+
+**Rule**: In this environment, all work must be committed within the existing repo. Separate repos need to be created and pushed from a local machine with proper credentials.
+
+---
+
+## 2026-04-23 — GitHub MCP Tools Are Repo-Scoped
+
+**Mistake**: Tried to create a new GitHub repo via `mcp__github__create_repository` — got 403 "Resource not accessible by integration".
+
+**Root cause**: The GitHub MCP token is scoped only to `trudaio/dcf-calculator`. It cannot create new repos or access other repos.
+
+**Rule**: MCP GitHub tools are limited to the repos listed in the session config. For operations on other repos, the user must do them manually or grant broader access.
