@@ -4,33 +4,35 @@ import { getQuote, getFinancials } from '../dataProvider.js';
  * Peer comparison: fetch quotes + basic financials for peer tickers.
  */
 export async function computePeers(ticker, peerTickers, subjectQuote) {
-  const peerQuotes = await Promise.all(
-    peerTickers.map(async (pt) => {
-      try {
-        const [q, fin] = await Promise.all([
-          getQuote(pt),
-          getFinancials(pt, 1),
-        ]);
-        if (!q) return null;
-        const latestIncome = fin?.[0];
-        const eps = latestIncome?.epsdiluted || latestIncome?.eps ||
-          (latestIncome?.netIncome && latestIncome?.weightedAverageShsOutDil
-            ? latestIncome.netIncome / latestIncome.weightedAverageShsOutDil
-            : 0);
-        const pe = eps ? q.price / eps : 0;
-
-        return {
-          ticker: pt,
-          name: q.name,
-          price: q.price,
-          peTTM: pe,
-          marketCap: q.marketCap,
-        };
-      } catch {
-        return null;
+  // Fetch peers sequentially — the FMP free tier rate-limits parallel requests
+  // (see tasks/lessons.md). Promise.all here intermittently triggered 402 errors.
+  const peerQuotes = [];
+  for (const pt of peerTickers) {
+    try {
+      const q = await getQuote(pt);
+      const fin = await getFinancials(pt, 1);
+      if (!q) {
+        peerQuotes.push(null);
+        continue;
       }
-    })
-  );
+      const latestIncome = fin?.[0];
+      const eps = latestIncome?.epsdiluted || latestIncome?.eps ||
+        (latestIncome?.netIncome && latestIncome?.weightedAverageShsOutDil
+          ? latestIncome.netIncome / latestIncome.weightedAverageShsOutDil
+          : 0);
+      const pe = eps ? q.price / eps : 0;
+
+      peerQuotes.push({
+        ticker: pt,
+        name: q.name,
+        price: q.price,
+        peTTM: pe,
+        marketCap: q.marketCap,
+      });
+    } catch {
+      peerQuotes.push(null);
+    }
+  }
 
   const validPeers = peerQuotes.filter((p) => p && p.peTTM > 0);
   const peerAveragePE = validPeers.length

@@ -13,7 +13,7 @@ export function computeProfitability(incomeStatements) {
     const prevRevenue = i > 0 ? (sorted[i - 1].revenue || 0) : null;
 
     return {
-      year: is.calendarYear || is.date?.slice(0, 4),
+      year: is.fiscalYear || is.calendarYear || is.date?.slice(0, 4),
       date: is.date,
       revenue,
       grossProfit,

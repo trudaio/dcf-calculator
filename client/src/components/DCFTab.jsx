@@ -68,7 +68,7 @@ export default function DCFTab({ data, settings, onRecalculate }) {
         <div style={{ marginTop: 8, fontSize: 14, color: '#8b949e' }}>
           Current: ${fmt(data?.currentPrice)} &nbsp;|&nbsp;
           <span style={{ color: data?.upsidePercent >= 0 ? '#3fb950' : '#f85149' }}>
-            {data?.upsidePercent >= 0 ? '+' : ''}{(data?.upsidePercent * 100).toFixed(1)}% upside
+            {data?.upsidePercent >= 0 ? '+' : ''}{fmt(data?.upsidePercent != null ? data.upsidePercent * 100 : null, 1)}% upside
           </span>
         </div>
       </div>

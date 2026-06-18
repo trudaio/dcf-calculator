@@ -31,8 +31,8 @@ export function computeDCF({
     const prevFCF = i === 1 ? baseFCF : timeline[i - 2].projectedFCF;
     let projectedFCF = prevFCF * (1 + rate);
 
-    // Apply override if provided
-    if (fcfOverrides[String(year)]) {
+    // Apply override if provided (use != null so an explicit 0 is honored)
+    if (fcfOverrides[String(year)] != null) {
       projectedFCF = fcfOverrides[String(year)];
     }
 
@@ -49,9 +49,12 @@ export function computeDCF({
     });
   }
 
-  // Terminal value (Gordon Growth Model)
+  // Terminal value (Gordon Growth Model).
+  // Guard against wacc <= terminalGrowth, which makes the formula blow up
+  // (zero/negative denominator → nonsensical or infinite valuation).
   const lastFCF = timeline[timeline.length - 1].projectedFCF;
-  const terminalValue = (lastFCF * (1 + terminalGrowth)) / (wacc - terminalGrowth);
+  const spread = wacc - terminalGrowth;
+  const terminalValue = spread > 0 ? (lastFCF * (1 + terminalGrowth)) / spread : 0;
   const pvTerminalValue = terminalValue / Math.pow(1 + wacc, horizonYears);
 
   const equityValue = cumulativePV + pvTerminalValue;
