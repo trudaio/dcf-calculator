@@ -51,3 +51,27 @@ Track mistakes and patterns to avoid repeating them.
 **Root cause**: Profile endpoint also doesn't have PE/EPS. Must compute from income statement: `eps = netIncome / weightedAverageShsOutDil`, `pe = price / eps`.
 
 **Rule**: For FMP stable API, always compute PE and EPS from income statement data. Don't rely on quote or profile endpoints for these.
+
+---
+
+## 2026-06-18 — Peers Fetch Re-introduced Promise.all (regression)
+
+**Mistake**: `domain/peers.js` fetched all peer quotes/financials with nested `Promise.all`, the exact pattern that triggers FMP free-tier 402 rate-limit errors.
+
+**Root cause**: The "sequential await" rule was applied to the main analysis flow but not to peer fetching, which was written separately.
+
+**Rule**: The sequential-await rule applies to EVERY path that hits FMP, including peers. Audit all call sites, not just the orchestrator.
+
+---
+
+## 2026-06-18 — Year Field Inconsistency Across Domain Modules
+
+**Mistake**: `profitability.js` derived the year from `calendarYear || date` while `fcfAnalysis.js` used `fiscalYear || calendarYear || date`. FMP stable returns `fiscalYear`, so profitability years could come out blank (breaking table rows / React keys).
+
+**Rule**: Resolve the period field consistently everywhere: `fiscalYear || calendarYear || date?.slice(0,4)`.
+
+---
+
+## 2026-06-18 — Added Demo Mode for Preview Without API Key
+
+**Note**: The app now runs in DEMO MODE when `FMP_API_KEY` is unset or `demo`, serving self-contained fixtures from `server/demoData.js`. This makes the dashboard previewable/runnable with zero external dependencies. Also added a Gordon-Growth guard for `wacc <= terminalGrowth` and honored explicit `0` FCF overrides.
